@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - '3000:80'
+  backend:
+    build: ./backend
+    command: npm run dev
+    ports:
+      - '4000:4000'
+    volumes:
+      - ./backend:/app
+  n8n:
+    image: n8nio/n8n:latest
+    ports:
+      - '5678:5678'
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: omnifeed
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_DB: omnifeed
+    ports:
+      - '5432:5432'

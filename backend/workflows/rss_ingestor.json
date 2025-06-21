@@ -1,0 +1,28 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "feedUrls": [
+          "https://example.com/feed1.xml",
+          "https://example.com/feed2.xml"
+        ],
+        "limit": 10
+      },
+      "name": "RSS Feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [200, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "// categorize items here",
+        "functionOutput": "json"
+      },
+      "name": "Categorize",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [400, 200]
+    }
+  ],
+  "connections": {}
+}

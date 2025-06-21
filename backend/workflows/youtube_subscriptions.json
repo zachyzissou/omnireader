@@ -1,0 +1,15 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "apiKey": "YOUR_YOUTUBE_API_KEY",
+        "channelId": ""
+      },
+      "name": "YouTube Channel",
+      "type": "n8n-nodes-base.googleApi",
+      "typeVersion": 1,
+      "position": [200, 200]
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,48 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Install Frontend Dependencies",
+      "type": "shell",
+      "command": "cd frontend && npm install",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build Frontend",
+      "type": "shell",
+      "command": "cd frontend && npm run build",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Frontend Dev",
+      "type": "shell",
+      "command": "cd frontend && npm run dev",
+      "isBackground": true,
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Install Backend Dependencies",
+      "type": "shell",
+      "command": "cd backend && npm install",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Backend Dev",
+      "type": "shell",
+      "command": "cd backend && npm run dev",
+      "isBackground": true,
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    }
+  ]
+}

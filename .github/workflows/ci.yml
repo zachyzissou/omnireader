@@ -1,0 +1,54 @@
+name: CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install Dependencies
+        run: |
+          cd frontend && npm install
+          cd ../backend && npm install
+      - name: Run ESLint
+        run: |
+          cd frontend && npm run lint || true
+      - name: Run Prettier Check
+        run: |
+          cd frontend && npm run format:check || true
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install Dependencies
+        run: |
+          cd frontend && npm install
+      - name: Run Jest Tests
+        run: |
+          cd frontend && npm test -- --ci --coverage
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Docker Images
+        run: |
+          docker-compose build
+      - name: Push to Registry
+        run: |
+          echo "Pushing images..."
+        # Add docker login and push commands here

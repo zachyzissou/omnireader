@@ -1,0 +1,36 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "track",
+        "operation": "getNewReleases",
+        "country": "US"
+      },
+      "name": "Spotify New Releases",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [250, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "// cross-reference with Plex API here",
+        "functionOutput": "json"
+      },
+      "name": "Plex Cross-Reference",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 200]
+    },
+    {
+      "parameters": {
+        "webhookUri": "={{$node[\"Plex Cross-Reference\"].json}}"
+      },
+      "name": "Notify Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [650, 200]
+    }
+  ],
+  "connections": {}
+}

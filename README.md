@@ -31,6 +31,8 @@ OmniFeed is an intelligent personal dashboard for aggregating and managing multi
 
 ```bash
 docker-compose up --build
+
+Run database migrations with `npm run migrate` inside the backend directory.
 ```
 
 - Frontend: [http://localhost:3000](http://localhost:3000)
@@ -40,7 +42,13 @@ docker-compose up --build
 ## Documentation
 
 - [Agents](AGENTS.md)
+- [Workflows](docs/WORKFLOWS.md)
+- [Plugins](docs/PLUGINS.md)
 
 ## Contributing
 
 Please submit PRs against `main`. Ensure linting and tests pass before merging.
+
+## Performance Profiling
+
+Start the backend with `PROFILING=true npm run dev` to log request durations.

@@ -1,0 +1,27 @@
+{
+  "name": "omnireader",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm run -r build",
+    "dev": "pnpm run -r dev",
+    "test": "pnpm run -r test",
+    "lint": "pnpm run -r lint",
+    "clean": "pnpm run -r clean",
+    "typecheck": "pnpm run -r typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.8.3",
+    "prettier": "^3.3.0",
+    "eslint": "^9.25.0",
+    "vitest": "^2.1.0",
+    "playwright": "^1.49.0"
+  },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

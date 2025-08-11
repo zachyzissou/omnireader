@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Source {
+  id           String      @id @default(cuid())
+  type         SourceType
+  url          String?
+  config       Json?
+  status       SourceStatus @default(ACTIVE)
+  lastFetchedAt DateTime?
+  items        Item[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@map("sources")
+}
+
+model Item {
+  id          String      @id @default(cuid())
+  sourceId    String
+  source      Source      @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  title       String
+  author      String?
+  url         String?
+  publishedAt DateTime
+  content     String?     // extracted readable text
+  media       Json?       // audio/video metadata
+  hash        String      @unique // for deduplication
+  raw         Json        // original payload
+  annotations Annotation[]
+  embeddings  Embedding[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([publishedAt])
+  @@index([hash])
+  @@map("items")
+}
+
+model Entity {
+  id    String @id @default(cuid())
+  name  String
+  type  String // person, organization, location, etc.
+  extra Json?
+
+  @@map("entities")
+}
+
+model Annotation {
+  id        String         @id @default(cuid())
+  itemId    String
+  item      Item           @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  kind      AnnotationType
+  text      String?
+  data      Json?
+  createdBy String?        // user ID
+  createdAt DateTime       @default(now())
+
+  @@map("annotations")
+}
+
+model Embedding {
+  id     String  @id @default(cuid())
+  itemId String
+  item   Item    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  vector Float[] // pgvector array
+  model  String  // embedding model used
+  dim    Int     // vector dimensions
+
+  @@map("embeddings")
+}
+
+model Filter {
+  id     String  @id @default(cuid())
+  name   String
+  logic  Json    // JSON Logic DSL
+  owner  String? // user ID
+  active Boolean @default(true)
+
+  @@map("filters")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String?       @unique
+  oidcSubject  String?       @unique
+  roles        String[]      // admin, user
+  deviceTokens DeviceToken[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("users")
+}
+
+model DeviceToken {
+  id       String @id @default(cuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token    String @unique
+  platform String // ios, android, web
+
+  @@map("device_tokens")
+}
+
+enum SourceType {
+  RSS
+  YOUTUBE
+  PODCAST
+  CUSTOM
+  N8N
+}
+
+enum SourceStatus {
+  ACTIVE
+  PAUSED
+  ERROR
+}
+
+enum AnnotationType {
+  SUMMARY
+  TAGS
+  TOPICS
+  HIGHLIGHTS
+  NOTE
+}

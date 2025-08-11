@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../services/api';
-import type { Source, Filter, ItemsFilters, SearchRequest } from '../types';
+import type { Source, Filter, ItemsFilters, SearchRequest, Item, SearchResult } from '../types';
 
 // Query keys
 export const queryKeys = {
@@ -15,7 +15,7 @@ export const queryKeys = {
 
 // Sources hooks
 export function useSources() {
-  return useQuery({
+  return useQuery<Source[]>({
     queryKey: queryKeys.sources,
     queryFn: () => apiClient.getSources(),
   });
@@ -68,14 +68,14 @@ export function useRefreshSource() {
 
 // Items hooks
 export function useItems(filters?: ItemsFilters) {
-  return useQuery({
+  return useQuery<{ items: Item[] }>({
     queryKey: queryKeys.items(filters),
     queryFn: () => apiClient.getItems(filters),
   });
 }
 
 export function useItem(id: string) {
-  return useQuery({
+  return useQuery<Item>({
     queryKey: queryKeys.item(id),
     queryFn: () => apiClient.getItem(id),
     enabled: !!id,
@@ -96,7 +96,7 @@ export function useAddAnnotation() {
 
 // Search hooks
 export function useSearch(query: string, options?: Partial<SearchRequest>) {
-  return useQuery({
+  return useQuery<SearchResult>({
     queryKey: queryKeys.search(query),
     queryFn: () => apiClient.search(query, options),
     enabled: query.length > 0,
@@ -104,7 +104,7 @@ export function useSearch(query: string, options?: Partial<SearchRequest>) {
 }
 
 export function useSimilarItems(itemId: string) {
-  return useQuery({
+  return useQuery<SearchResult>({
     queryKey: queryKeys.similar(itemId),
     queryFn: () => apiClient.getSimilarItems(itemId),
     enabled: !!itemId,
@@ -113,7 +113,7 @@ export function useSimilarItems(itemId: string) {
 
 // Filters hooks
 export function useFilters() {
-  return useQuery({
+  return useQuery<Filter[]>({
     queryKey: queryKeys.filters,
     queryFn: () => apiClient.getFilters(),
   });

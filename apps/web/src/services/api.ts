@@ -1,4 +1,4 @@
-import type { Source, Filter, ItemsFilters, SearchRequest } from '../types';
+import type { Source, Filter, ItemsFilters, SearchRequest, SearchResult, Item } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -79,37 +79,37 @@ class ApiClient {
   }
 
   // Brain service endpoints (proxied through API gateway)
-  async getSources() {
+  async getSources(): Promise<Source[]> {
     return this.request('/api/brain/sources');
   }
 
-  async createSource(data: Partial<Source>) {
+  async createSource(data: Partial<Source>): Promise<Source> {
     return this.request('/api/brain/sources', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async updateSource(id: string, data: Partial<Source>) {
+  async updateSource(id: string, data: Partial<Source>): Promise<Source> {
     return this.request(`/api/brain/sources/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
     });
   }
 
-  async deleteSource(id: string) {
+  async deleteSource(id: string): Promise<void> {
     return this.request(`/api/brain/sources/${id}`, {
       method: 'DELETE',
     });
   }
 
-  async refreshSource(id: string) {
+  async refreshSource(id: string): Promise<void> {
     return this.request(`/api/brain/sources/${id}/refresh`, {
       method: 'POST',
     });
   }
 
-  async getItems(filters: ItemsFilters = {}) {
+  async getItems(filters: ItemsFilters = {}): Promise<{ items: Item[] }> {
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
       if (value) params.append(key, String(value));
@@ -119,47 +119,47 @@ class ApiClient {
     return this.request(`/api/brain/items${query ? `?${query}` : ''}`);
   }
 
-  async getItem(id: string) {
+  async getItem(id: string): Promise<Item> {
     return this.request(`/api/brain/items/${id}`);
   }
 
-  async addAnnotation(itemId: string, annotation: Record<string, unknown>) {
+  async addAnnotation(itemId: string, annotation: Record<string, unknown>): Promise<void> {
     return this.request(`/api/brain/items/${itemId}/annotate`, {
       method: 'POST',
       body: JSON.stringify(annotation),
     });
   }
 
-  async search(query: string, options: Partial<SearchRequest> = {}) {
+  async search(query: string, options: Partial<SearchRequest> = {}): Promise<SearchResult> {
     return this.request('/api/brain/search', {
       method: 'POST',
       body: JSON.stringify({ query, ...options }),
     });
   }
 
-  async getSimilarItems(itemId: string, limit = 10) {
+  async getSimilarItems(itemId: string, limit = 10): Promise<SearchResult> {
     return this.request(`/api/brain/search/similar/${itemId}?limit=${limit}`);
   }
 
-  async getFilters() {
+  async getFilters(): Promise<Filter[]> {
     return this.request('/api/brain/filters');
   }
 
-  async createFilter(filter: Partial<Filter>) {
+  async createFilter(filter: Partial<Filter>): Promise<Filter> {
     return this.request('/api/brain/filters', {
       method: 'POST',
       body: JSON.stringify(filter),
     });
   }
 
-  async updateFilter(id: string, filter: Partial<Filter>) {
+  async updateFilter(id: string, filter: Partial<Filter>): Promise<Filter> {
     return this.request(`/api/brain/filters/${id}`, {
       method: 'PUT',
       body: JSON.stringify(filter),
     });
   }
 
-  async deleteFilter(id: string) {
+  async deleteFilter(id: string): Promise<void> {
     return this.request(`/api/brain/filters/${id}`, {
       method: 'DELETE',
     });

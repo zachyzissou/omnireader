@@ -1,19 +1,22 @@
 FROM node:20-alpine AS base
 
+# Install pnpm
+RUN npm install -g pnpm
+
 # Install dependencies only when needed
 FROM base AS deps
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
+COPY package.json ./
+RUN pnpm install --frozen-lockfile --production
 
 # Development image
 FROM base AS dev
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
+COPY package.json ./
+RUN pnpm install --frozen-lockfile
 COPY . .
 EXPOSE 5000
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "run", "dev"]
 
 # Production image
 FROM base AS runner
@@ -23,11 +26,11 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client
-RUN npx prisma generate
+# Generate Prisma client with fallback
+RUN pnpm run db:generate:safe
 
 # Build the application
-RUN npm run build
+RUN pnpm run build
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
@@ -38,4 +41,4 @@ EXPOSE 5000
 
 ENV NODE_ENV=production
 
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]

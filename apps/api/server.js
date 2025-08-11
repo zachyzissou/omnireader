@@ -1,43 +1,90 @@
 import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import bodyParser from 'body-parser';
-import { loadPlugins } from './pluginLoader.js';
-import { suggest } from './ai/suggestions.js';
-import db from './db.js';
-import { profileMiddleware } from './profiling.js';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import { z } from 'zod';
+import { logger } from './src/utils/logger.js';
+import { setupRoutes } from './src/routes/index.js';
 
 const app = express();
-app.use(bodyParser.json());
+const port = process.env.PORT || 4000;
 
-if (process.env.PROFILING === 'true') {
-  app.use(profileMiddleware);
-}
+// Security middleware
+app.use(helmet());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  credentials: true,
+}));
 
-// Load plugins
-const loadedPlugins = await loadPlugins(app);
-app.get('/api/plugins', (req, res) => res.json(loadedPlugins));
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+});
+app.use('/api/', limiter);
 
-// Workflow endpoints
-app.post('/api/workflows/music-fetcher', (req, res) => {
-  res.status(200).json({ message: 'MusicFetcher workflow triggered', data: req.body });
-});
-app.post('/api/workflows/rss-ingestor', (req, res) => {
-  res.status(200).json({ message: 'RSSIngestor workflow triggered', data: req.body });
-});
-app.post('/api/workflows/podcast-tracker', (req, res) => {
-  res.status(200).json({ message: 'PodcastTracker workflow triggered', data: req.body });
-});
-app.post('/api/workflows/youtube-subscriptions', (req, res) => {
-  res.status(200).json({ message: 'YouTubeSubscriptions workflow triggered', data: req.body });
+// Parse JSON bodies
+app.use(express.json({ limit: '10mb' }));
+
+// Request logging middleware
+app.use((req, res, next) => {
+  logger.info(`${req.method} ${req.path}`, {
+    ip: req.ip,
+    userAgent: req.get('User-Agent'),
+  });
+  next();
 });
 
-// AI suggestions endpoint
-app.post('/api/suggestions', (req, res) => {
-  const suggestions = suggest(req.body.items || []);
-  res.json({ suggestions });
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Brain service proxy (authenticated requests)
+const brainProxy = createProxyMiddleware({
+  target: process.env.BRAIN_URL || 'http://localhost:5000',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/brain': '/api',
+  },
+  onError: (err, req, res) => {
+    logger.error('Brain proxy error:', err);
+    res.status(503).json({ error: 'Brain service unavailable' });
+  },
+});
+
+app.use('/api/brain', brainProxy);
+
+// API routes (authentication, webhooks, etc.)
+setupRoutes(app);
+
+// Error handling
+app.use((err, req, res, next) => {
+  logger.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
+// Start server
+app.listen(port, () => {
+  logger.info(`API Gateway running on port ${port}`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM received, shutting down gracefully');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  logger.info('SIGINT received, shutting down gracefully');
+  process.exit(0);
 });
 
 // Smart Filters CRUD

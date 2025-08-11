@@ -1,38 +1,72 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { useAppStore } from './store/app';
+import { Layout } from './components/Layout';
+import { ConfigWizard } from './components/ConfigWizard';
+import { AuthPage } from './pages/Auth';
+import { HomePage } from './pages/Home';
+import { InboxPage } from './pages/Inbox';
+import { SearchPage } from './pages/Search';
+import { ItemPage } from './pages/Item';
+import { FiltersPage } from './pages/Filters';
+import { SettingsPage } from './pages/Settings';
 import './App.css';
-import Sidebar from './components/Sidebar';
-import FilterBuilder from './components/FilterBuilder';
-import PluginPanel from './components/PluginPanel';
-import ThemeSwitcher from './components/ThemeSwitcher';
-import ConfigWizard from './components/ConfigWizard';
+
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: (failureCount, error: any) => {
+        // Don't retry on auth errors
+        if (error?.message?.includes('401') || error?.message?.includes('403')) {
+          return false;
+        }
+        return failureCount < 3;
+      },
+    },
+  },
+});
 
 function App() {
-  const [collapsed, setCollapsed] = useState(false);
-  const [wizardComplete, setWizardComplete] = useState(false);
+  const { user, wizardCompleted, theme } = useAppStore();
 
-  useEffect(() => {
-    const completed = localStorage.getItem('wizardCompleted') === 'true';
-    setWizardComplete(completed);
-  }, []);
+  // Apply theme on app load
+  React.useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
 
   return (
-    <div className="flex h-screen">
-      {!wizardComplete ? (
-        <ConfigWizard onComplete={() => setWizardComplete(true)} />
-      ) : (
-        <>
-          <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
-          <main className="flex-1 p-6 bg-gray-100 dark:bg-gray-800 overflow-auto">
-            <div className="flex justify-end mb-4">
-              <ThemeSwitcher />
-            </div>
-            <FilterBuilder />
-            <PluginPanel />
-            {/* Further content cards go here */}
-          </main>
-        </>
-      )}
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          {!wizardCompleted ? (
+            <ConfigWizard />
+          ) : !user ? (
+            <AuthPage />
+          ) : (
+            <Layout>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/inbox" element={<InboxPage />} />
+                <Route path="/search" element={<SearchPage />} />
+                <Route path="/items/:id" element={<ItemPage />} />
+                <Route path="/filters" element={<FiltersPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Layout>
+          )}
+        </div>
+      </Router>
+      {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
+    </QueryClientProvider>
   );
 }
 

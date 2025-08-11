@@ -1,3 +1,5 @@
+import type { Source, Filter, ItemsFilters, SearchRequest } from '../types';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 class ApiClient {
@@ -81,14 +83,14 @@ class ApiClient {
     return this.request('/api/brain/sources');
   }
 
-  async createSource(data: any) {
+  async createSource(data: Partial<Source>) {
     return this.request('/api/brain/sources', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async updateSource(id: string, data: any) {
+  async updateSource(id: string, data: Partial<Source>) {
     return this.request(`/api/brain/sources/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
@@ -107,7 +109,7 @@ class ApiClient {
     });
   }
 
-  async getItems(filters: any = {}) {
+  async getItems(filters: ItemsFilters = {}) {
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
       if (value) params.append(key, String(value));
@@ -121,14 +123,14 @@ class ApiClient {
     return this.request(`/api/brain/items/${id}`);
   }
 
-  async addAnnotation(itemId: string, annotation: any) {
+  async addAnnotation(itemId: string, annotation: Record<string, unknown>) {
     return this.request(`/api/brain/items/${itemId}/annotate`, {
       method: 'POST',
       body: JSON.stringify(annotation),
     });
   }
 
-  async search(query: string, options: any = {}) {
+  async search(query: string, options: Partial<SearchRequest> = {}) {
     return this.request('/api/brain/search', {
       method: 'POST',
       body: JSON.stringify({ query, ...options }),
@@ -143,14 +145,14 @@ class ApiClient {
     return this.request('/api/brain/filters');
   }
 
-  async createFilter(filter: any) {
+  async createFilter(filter: Partial<Filter>) {
     return this.request('/api/brain/filters', {
       method: 'POST',
       body: JSON.stringify(filter),
     });
   }
 
-  async updateFilter(id: string, filter: any) {
+  async updateFilter(id: string, filter: Partial<Filter>) {
     return this.request(`/api/brain/filters/${id}`, {
       method: 'PUT',
       body: JSON.stringify(filter),

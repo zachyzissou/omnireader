@@ -3,7 +3,7 @@ export interface Source {
   id: string;
   type: 'RSS' | 'YOUTUBE' | 'PODCAST' | 'CUSTOM' | 'N8N';
   url?: string;
-  config?: Record<string, any>;
+  config?: Record<string, unknown>;
   status: 'ACTIVE' | 'PAUSED' | 'ERROR';
   lastFetchedAt?: string;
   createdAt: string;
@@ -22,9 +22,9 @@ export interface Item {
   url?: string;
   publishedAt: string;
   content?: string;
-  media?: Record<string, any>;
+  media?: Record<string, unknown>;
   hash: string;
-  raw: Record<string, any>;
+  raw: Record<string, unknown>;
   annotations: Annotation[];
   createdAt: string;
   updatedAt: string;
@@ -38,7 +38,7 @@ export interface Annotation {
   itemId: string;
   kind: 'SUMMARY' | 'TAGS' | 'TOPICS' | 'HIGHLIGHTS' | 'NOTE';
   text?: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
   createdBy?: string;
   createdAt: string;
 }
@@ -46,7 +46,7 @@ export interface Annotation {
 export interface Filter {
   id: string;
   name: string;
-  logic: Record<string, any>; // JSON Logic DSL
+  logic: Record<string, unknown>; // JSON Logic DSL
   owner?: string;
   active: boolean;
 }

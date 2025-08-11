@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../services/api';
-import type { Source, Item, Filter, ItemsFilters, SearchRequest } from '../types';
+import type { Source, Filter, ItemsFilters, SearchRequest } from '../types';
 
 // Query keys
 export const queryKeys = {
@@ -86,7 +86,7 @@ export function useAddAnnotation() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ itemId, annotation }: { itemId: string; annotation: any }) =>
+    mutationFn: ({ itemId, annotation }: { itemId: string; annotation: Record<string, unknown> }) =>
       apiClient.addAnnotation(itemId, annotation),
     onSuccess: (_, { itemId }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.item(itemId) });

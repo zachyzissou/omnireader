@@ -5,7 +5,7 @@ export interface ConfigWizardProps {
   onComplete: () => void;
 }
 
-const ConfigWizard: React.FC<ConfigWizardProps> = ({ onComplete }) => {
+export const ConfigWizard: React.FC<ConfigWizardProps> = ({ onComplete }) => {
   const steps = [
     'Account Linking',
     'Feed Discovery',
@@ -117,4 +117,4 @@ const ConfigWizard: React.FC<ConfigWizardProps> = ({ onComplete }) => {
   );
 };
 
-export default ConfigWizard;
+

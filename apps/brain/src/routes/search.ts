@@ -3,6 +3,41 @@ import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import { logger } from '../utils/logger.js';
 
+// Type for Item with included relations
+type ItemWithRelations = {
+  id: string;
+  sourceId: string;
+  title: string;
+  author: string | null;
+  url: string | null;
+  publishedAt: Date;
+  content: string | null;
+  media: unknown;
+  hash: string;
+  raw: unknown;
+  createdAt: Date;
+  updatedAt: Date;
+  source: {
+    id: string;
+    type: string;
+    url: string | null;
+    config: unknown;
+    status: string;
+    lastFetchedAt: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  annotations: Array<{
+    id: string;
+    itemId: string;
+    kind: string;
+    text: string | null;
+    data: unknown;
+    createdBy: string | null;
+    createdAt: Date;
+  }>;
+};
+
 const router = express.Router();
 
 const SearchRequestSchema = z.object({
@@ -40,7 +75,7 @@ export function createSearchRoutes(prisma: PrismaClient): express.Router {
 
       res.json({
         query,
-        results: items.map((item: Item & { source: Source, annotations: Annotation[] }) => ({
+        results: items.map((item: ItemWithRelations) => ({
           ...item,
           score: 1.0, // TODO: Calculate relevance score
         })),

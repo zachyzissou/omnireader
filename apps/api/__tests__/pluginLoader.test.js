@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest';
 import express from 'express';
 import { loadPlugins } from '../pluginLoader.js';
 

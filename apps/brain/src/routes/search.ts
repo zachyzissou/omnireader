@@ -40,7 +40,7 @@ export function createSearchRoutes(prisma: PrismaClient): express.Router {
 
       res.json({
         query,
-        results: items.map((item: any) => ({
+        results: items.map((item: Item & { source: Source, annotations: Annotation[] }) => ({
           ...item,
           score: 1.0, // TODO: Calculate relevance score
         })),

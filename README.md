@@ -11,6 +11,7 @@ OmniFeed is an intelligent personal dashboard for aggregating and managing multi
 - Docker Compose setup for frontend, backend, n8n workflow engine, and Postgres storage
 - CI/CD via GitHub Actions: linting, testing, and Docker image builds
 - First-run configuration wizard for account linking, feed discovery, notifications, and advanced settings
+  - Onboarding state persists via `/api/settings/onboarding`
 
 ## Getting Started
 
@@ -21,13 +22,19 @@ OmniFeed is an intelligent personal dashboard for aggregating and managing multi
 
 ### Local Development
 
-1. Install dependencies and start services via VS Code Tasks:
+1. Copy the sample backend environment file and adjust credentials as needed:
+
+   ```bash
+   cp backend/.env.example backend/.env
+   ```
+
+2. Install dependencies and start services via VS Code Tasks:
    - **Install Frontend Dependencies**
    - **Start Frontend Dev**
    - **Install Backend Dependencies**
    - **Start Backend Dev**
 
-2. Alternatively, use Docker Compose:
+3. Alternatively, use Docker Compose:
 
 ```bash
 docker-compose up --build
@@ -38,6 +45,11 @@ Run database migrations with `npm run migrate` inside the backend directory.
 - Frontend: [http://localhost:3000](http://localhost:3000)
 - Backend API: [http://localhost:4000](http://localhost:4000)
 - n8n Editor: [http://localhost:5678](http://localhost:5678)
+
+### Testing
+
+- Backend: `cd backend && npm test` (defaults to an in-memory SQLite store when `NODE_ENV=test`). Ensure dependencies are installed (`npm install`) before running.
+- Frontend: tests are not yet configured; coordinate with the team before introducing Vitest or similar tooling.
 
 ## Documentation
 
@@ -52,3 +64,9 @@ Please submit PRs against `main`. Ensure linting and tests pass before merging.
 ## Performance Profiling
 
 Start the backend with `PROFILING=true npm run dev` to log request durations.
+
+### Operations
+
+- Health check: `curl http://localhost:4000/healthz` (returns status, loaded plugins, timestamp).
+- Feed preview: `curl http://localhost:4000/api/feeds` for the latest snapshot (`/api/feeds/music`, `/api/feeds/news`, etc. for specific streams).
+- Logs: set `LOG_LEVEL=debug` to increase verbosity; request IDs are emitted via `x-request-id` headers and structured logs.

@@ -10,14 +10,42 @@ export async function loadPlugins(app) {
   const loaded = [];
   for (const file of fs.readdirSync(pluginsDir)) {
     if (file.endsWith('.js')) {
-      const mod = await import(path.join(pluginsDir, file));
-      const plugin = mod.default || mod;
-      if (plugin && typeof plugin.register === 'function') {
-        plugin.register(app);
-        if (plugin.hooks) {
-          Object.entries(plugin.hooks).forEach(([type, fn]) => registerHook(type, fn));
+      const pluginPath = path.join(pluginsDir, file);
+      try {
+        const mod = await import(pluginPath);
+        const plugin = mod.default || mod;
+        if (!plugin || typeof plugin.register !== 'function') {
+          console.warn(`Skipping plugin ${file}: missing register(app)`);
+          continue;
         }
-        loaded.push(plugin.meta || { name: file.replace('.js', '') });
+
+        try {
+          await plugin.register(app);
+        } catch (err) {
+          console.error(`Plugin ${file} failed to register`, err);
+          continue;
+        }
+
+        if (plugin.hooks && typeof plugin.hooks === 'object') {
+          Object.entries(plugin.hooks).forEach(([type, fn]) => {
+            if (typeof fn === 'function') {
+              registerHook(type, fn);
+            }
+          });
+        }
+
+        const meta = plugin.meta && typeof plugin.meta === 'object'
+          ? {
+              name: plugin.meta.name || file.replace('.js', ''),
+              permissions: Array.isArray(plugin.meta.permissions)
+                ? plugin.meta.permissions
+                : [],
+            }
+          : { name: file.replace('.js', ''), permissions: [] };
+
+        loaded.push(meta);
+      } catch (error) {
+        console.error(`Failed to load plugin ${file}`, error);
       }
     }
   }

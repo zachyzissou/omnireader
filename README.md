@@ -1,3 +1,6 @@
+> **License Notice**
+> This repository is source-visible only. No copying, modification, redistribution, deployment, or commercial use is permitted without prior written permission from Zach Gonser. See `LICENSE` for details.
+
 # OmniFeed
 
 OmniFeed is an intelligent personal dashboard for aggregating and managing multimedia content.
@@ -59,7 +62,9 @@ Run database migrations with `npm run migrate` inside the backend directory.
 
 ## Contributing
 
-Please submit PRs against `main`. Ensure linting and tests pass before merging.
+Contributions are accepted only with prior written permission from Zach Gonser and are reviewed case-by-case.
+If authorized to contribute, submit PRs against `main` and ensure linting/tests pass before review.
+By submitting a contribution, you agree to the inbound contribution license terms in `LICENSE`.
 
 ## Performance Profiling
 

@@ -1,4 +1,4 @@
-# SlurpNet Source-Visible License v1.0
+# OmniFeed Source-Visible License v1.0
 
 Copyright (c) 2026 Zach Gonser and contributors authorized by Zach Gonser.
 All rights reserved.
@@ -16,8 +16,15 @@ Without prior written permission from Zach Gonser, you may not:
 - use the code to provide hosted or managed services,
 - remove or alter copyright, attribution, or license notices.
 
+## Third-party components
+This license applies only to original code and content in this repository that Zach Gonser has rights to license.
+Third-party code, assets, and dependencies included in or referenced by this repository remain subject to their own licenses and notices.
+Nothing in this license modifies, restricts, or supersedes rights granted by applicable third-party licenses.
+
 ## Contributions
 Unless explicitly agreed otherwise in writing, any contribution, patch, pull request, or suggestion submitted for this repository may be rejected and does not grant you any rights to this codebase.
+By submitting any contribution, patch, pull request, or suggestion, you grant Zach Gonser and contributors authorized by Zach Gonser a perpetual, irrevocable, worldwide, non-exclusive, royalty-free license to use, reproduce, modify, adapt, publish, distribute, sublicense, and incorporate that submission, in whole or in part, into this codebase and related works.
+You represent that you have the legal right to grant this license for any submission you make.
 
 ## Trademark and branding
 No trademark, service mark, trade name, logo, or brand feature license is granted.

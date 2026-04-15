@@ -62,7 +62,9 @@ Run database migrations with `npm run migrate` inside the backend directory.
 
 ## Contributing
 
-Please submit PRs against `main`. Ensure linting and tests pass before merging.
+Contributions are accepted only with prior written permission from Zach Gonser and are reviewed case-by-case.
+If authorized to contribute, submit PRs against `main` and ensure linting/tests pass before review.
+By submitting a contribution, you agree to the inbound contribution license terms in `LICENSE`.
 
 ## Performance Profiling
 
